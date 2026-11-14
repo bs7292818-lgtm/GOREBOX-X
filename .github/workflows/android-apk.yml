@@ -1,0 +1,33 @@
+name: Android APK build
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'GOREBOX_X_Godot/**'
+      - '.github/workflows/android-apk.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Android APK with Godot CI
+        uses: barichello/godot-ci@v4.3.0
+        with:
+          godot_version: '4.3.0'
+          export_templates: true
+          android: true
+      - name: Export debug APK
+        run: |
+          mkdir -p build
+          godot --headless --path GOREBOX_X_Godot --export-debug "Android" build/GOREBOX_X.apk
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: GOREBOX-X-Android-APK
+          path: build/GOREBOX_X.apk
+          if-no-files-found: error
+          retention-days: 14
